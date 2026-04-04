@@ -2,16 +2,15 @@
 {
     public static class EngineFactory
     {
-        public static FuzzyEngine Create(AdaptiveController adaptive)
-        {
-            return new FuzzyEngine(new List<Rule>
+        public static FuzzyEngine Create(AdaptiveController adaptive) =>
+            new FuzzyEngine(new List<Rule>
             {
-                new Rule(x => Math.Min(x["time_high"], x["enemies_high"]), "high", "Hard level"),
-                new Rule(x => Math.Min(x["health_low"], x["damage_high"]), "high", "Critical state"),
-                new Rule(x => Math.Min(x["accuracy_high"], x["time_low"]), "low", "Pro player"),
-                new Rule(x => x["health_high"], "low", "High HP"),
-                new Rule(x => 0.5, "medium", "Default")
+                new Rule(x => Math.Min(x["skill_high"], x["accuracy_high"]), "high", "Професіонал"),
+                new Rule(x => Math.Min(x["stress_high"], x["health_low"]), "low", "Перевантаження"),
+                new Rule(x => Math.Min(x["reaction_fast"], x["skill_high"]), "high", "Швидка реакція"),
+                new Rule(x => Math.Min(x["reaction_slow"], x["stress_high"]), "low", "Повільно + стрес"),
+                new Rule(x => x["progress_late"], "high", "Пізній етап"),
+                new Rule(x => 0.5, "medium", "Базове правило")
             }, adaptive);
-        }
     }
 }
