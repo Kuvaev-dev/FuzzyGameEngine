@@ -48,13 +48,13 @@
                             VerticalAlignment="Center"
                             Grid.Column="1" Margin="40,0,0,0">
                     <RadioButton Content="Ручний режим"
-                                 IsChecked="{Binding IsManualMode}"
+                                 IsChecked="{Binding IsManualMode, Mode=OneWay}"
                                  Foreground="{DynamicResource MainForeground}"
                                  FontSize="15" Margin="0,0,45,0"/>
                     <RadioButton Content="Автоматичний режим"
-                                 IsChecked="{Binding IsAutoMode}"
+                                 IsChecked="{Binding IsAutoMode, Mode=TwoWay}"
                                  Foreground="{DynamicResource MainForeground}"
-                                 FontSize="15"/>
+                                 FontSize="15"/>            
                 </StackPanel>
                 <Button Content="🌓 Змінити тему"
                         Command="{Binding ToggleThemeCommand}"
@@ -85,7 +85,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Час на рівні (с)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="300" Value="{Binding Time, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>            
                                 <TextBox Text="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -103,7 +104,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Кількість ворогів" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="50" Value="{Binding Enemies, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>            
                                 <TextBox Text="{Binding Enemies, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -121,7 +123,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Здоров'я гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding Health, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>            
                                 <TextBox Text="{Binding Health, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -139,7 +142,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Точність стрільби (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding Accuracy, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>            
                                 <TextBox Text="{Binding Accuracy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -157,7 +161,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Пошкодження отримані (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding Damage, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>        
                                 <TextBox Text="{Binding Damage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -175,7 +180,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Навичка гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding PlayerSkill, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>        
                                 <TextBox Text="{Binding PlayerSkill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -193,7 +199,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Рівень стресу (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding StressLevel, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>        
                                 <TextBox Text="{Binding StressLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -211,7 +218,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Прогрес рівня (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="100" Value="{Binding Progress, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>        
                                 <TextBox Text="{Binding Progress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
@@ -229,7 +237,8 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Час реакції (мс)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
                                 <Slider Minimum="0" Maximum="1000" Value="{Binding ReactionTime, Mode=TwoWay}"
-                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"
+                                        ValueChanged="Slider_ValueChanged"/>        
                                 <TextBox Text="{Binding ReactionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                          Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
                                          Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"

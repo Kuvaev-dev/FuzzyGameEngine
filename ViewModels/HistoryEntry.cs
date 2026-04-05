@@ -4,7 +4,6 @@
     {
         public DateTime Timestamp { get; set; } = DateTime.Now;
         public double DifficultyValue { get; set; }
-        public string Conclusion { get; set; } = string.Empty;
         public double Bias { get; set; }
         public double Time { get; set; }
         public double Enemies { get; set; }
@@ -18,6 +17,14 @@
         public string Explain { get; set; } = string.Empty;
 
         public string DisplayText =>
-            $"{Timestamp:T} | Складність: {DifficultyValue:F1} | {Conclusion} | Bias: {Bias:F2}";
+            $"{Timestamp:T} | Складність: {DifficultyValue:F1} | {ShortConclusionText()} | Bias: {Bias:F2}";
+
+        private string ShortConclusionText()
+        {
+            if (DifficultyValue == 0) return "—";
+            if (DifficultyValue < 40) return "Легкий";
+            if (DifficultyValue < 70) return "Оптимально";
+            return "Занадто складно";
+        }
     }
 }
