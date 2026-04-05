@@ -28,20 +28,13 @@ namespace FuzzyGameEngine.ViewModels
 
         public ICommand CalculateCommand { get; }
         public ICommand SimulateCommand { get; }
-        public ICommand ClearCommand { get; }
+        public ICommand ClearHistoryCommand { get; }
+        public ICommand ClearValuesCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand LoadFileCommand { get; }
         public ICommand LoadHistoryCommand { get; }
         public ICommand ToggleThemeCommand { get; }
 
-        private HistoryEntry? selectedHistoryEntry;
-        public HistoryEntry? SelectedHistoryEntry
-        {
-            get => selectedHistoryEntry;
-            set => Set(ref selectedHistoryEntry, value);
-        }
-
-        // Поля з валідацією
         private double time; public double Time { get => time; set => Set(ref time, value); }
         private double enemies; public double Enemies { get => enemies; set => Set(ref enemies, value); }
         private double health; public double Health { get => health; set => Set(ref health, value); }
@@ -51,11 +44,11 @@ namespace FuzzyGameEngine.ViewModels
         private double stressLevel; public double StressLevel { get => stressLevel; set => Set(ref stressLevel, value); }
         private double progress; public double Progress { get => progress; set => Set(ref progress, value); }
         private double reactionTime; public double ReactionTime { get => reactionTime; set => Set(ref reactionTime, value); }
-
         private double difficultyValue; public double DifficultyValue { get => difficultyValue; set => Set(ref difficultyValue, value); }
         private double bias; public double Bias { get => bias; set => Set(ref bias, value); }
         private string conclusion = string.Empty; public string Conclusion { get => conclusion; set => Set(ref conclusion, value); }
 
+        
         private bool isAutoMode;
         public bool IsAutoMode
         {
@@ -67,6 +60,36 @@ namespace FuzzyGameEngine.ViewModels
                 if (value) timer.Start(); else timer.Stop();
             }
         }
+
+        private string detailedConclusion = string.Empty;
+        public string DetailedConclusion
+        {
+            get => detailedConclusion;
+            set => Set(ref detailedConclusion, value);
+        }
+
+        public string ShortConclusion
+        {
+            get
+            {
+                if (DifficultyValue == 0)
+                    return string.Empty;
+
+                if (DifficultyValue < 40)
+                    return "Легко";
+                if (DifficultyValue < 70)
+                    return "Оптимально";
+                return "Занадто складно";
+            }
+        }
+
+        private HistoryEntry? selectedHistoryEntry;
+        public HistoryEntry? SelectedHistoryEntry
+        {
+            get => selectedHistoryEntry;
+            set => Set(ref selectedHistoryEntry, value);
+        }
+
         public bool IsManualMode { get => !isAutoMode; set => IsAutoMode = !value; }
 
         private bool isDarkTheme = true;
@@ -98,7 +121,8 @@ namespace FuzzyGameEngine.ViewModels
 
             CalculateCommand = new RelayCommand(_ => Calc());
             SimulateCommand = new RelayCommand(_ => Simulate());
-            ClearCommand = new RelayCommand(_ => Clear());
+            ClearHistoryCommand = new RelayCommand(_ => ClearHistory());
+            ClearValuesCommand = new RelayCommand(_ => ClearValues());
             SaveCommand = new RelayCommand(_ => Save());
             LoadFileCommand = new RelayCommand(_ => LoadFromFile());
             LoadHistoryCommand = new RelayCommand(_ => LoadSelectedHistory());
@@ -134,8 +158,15 @@ namespace FuzzyGameEngine.ViewModels
                 var (res, explain, fullLog) = engine.Evaluate(state);
 
                 DifficultyValue = res;
+
                 Bias = adaptive.GetBias();
-                Conclusion = res < 30 ? "Занадто легко" : res < 70 ? "Оптимально" : "Занадто складно";
+
+                DetailedConclusion = res switch
+                {
+                    < 30 => "Занадто легко — рівень дуже простий, гравець проходить його без зусиль і може швидко втратити інтерес",
+                    < 70 => "Оптимально — ідеальний баланс складності. Гравець відчуває виклик, але не розчаровується",
+                    _ => "Занадто складно — рівень надто важкий, гравець може швидко втратити мотивацію та кинути гру"
+                };
 
                 ChartData.Add(res);
                 BiasHistory.Add(Bias);
@@ -168,6 +199,8 @@ namespace FuzzyGameEngine.ViewModels
 
                 RaisePropertyChanged(nameof(ChartData));
                 RaisePropertyChanged(nameof(BiasHistory));
+                RaisePropertyChanged(nameof(ShortConclusion));
+                RaisePropertyChanged(nameof(DetailedConclusion));
             }
             catch (Exception ex)
             {
@@ -187,6 +220,7 @@ namespace FuzzyGameEngine.ViewModels
             StressLevel = r.Next(0, 100);
             Progress = r.Next(0, 100);
             ReactionTime = r.Next(100, 800);
+
             Calc();
         }
 
@@ -202,13 +236,49 @@ namespace FuzzyGameEngine.ViewModels
             StressLevel = SelectedHistoryEntry.StressLevel;
             Progress = SelectedHistoryEntry.Progress;
             ReactionTime = SelectedHistoryEntry.ReactionTime;
+
+            DifficultyValue = SelectedHistoryEntry.DifficultyValue;
+            Conclusion = SelectedHistoryEntry.Conclusion;
+            Bias = SelectedHistoryEntry.Bias;
+
+            RaisePropertyChanged(nameof(ShortConclusion));
+            RaisePropertyChanged(nameof(DetailedConclusion));
+        }
+
+        private void ClearHistory()
+        {
+            History.Clear();
+            LogEntries.Clear();
+            ChartData.Clear();
+            BiasHistory.Clear();
+        }
+
+        private void ClearValues()
+        {
+            Time = 0;
+            Enemies = 0;
+            Health = 0;
+            Accuracy = 0;
+            Damage = 0;
+            PlayerSkill = 0;
+            StressLevel = 0;
+            Progress = 0;
+            ReactionTime = 0;
+            DifficultyValue = 0;
+            Conclusion = string.Empty;
+            Bias = 1.0;
+
+            DetailedConclusion = string.Empty;
+
+            RaisePropertyChanged(nameof(ShortConclusion));
+            RaisePropertyChanged(nameof(DetailedConclusion));
         }
 
         private void Save()
         {
             var dialog = new SaveFileDialog { Filter = "CSV files (*.csv)|*.csv", FileName = "fuzzy_results.csv" };
             if (dialog.ShowDialog() != true) return;
-
+            
             try
             {
                 using var sw = new StreamWriter(dialog.FileName);
@@ -230,6 +300,7 @@ namespace FuzzyGameEngine.ViewModels
         private void LoadFromFile()
         {
             var dialog = new OpenFileDialog { Filter = "CSV files (*.csv)|*.csv" };
+            
             if (dialog.ShowDialog() != true) return;
 
             try
@@ -271,14 +342,6 @@ namespace FuzzyGameEngine.ViewModels
             {
                 MessageBox.Show($"Помилка завантаження: {ex.Message}");
             }
-        }
-
-        private void Clear()
-        {
-            ChartData.Clear();
-            BiasHistory.Clear();
-            History.Clear();
-            LogEntries.Clear();
         }
     }
 }

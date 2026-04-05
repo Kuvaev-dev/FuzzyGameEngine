@@ -20,10 +20,12 @@ namespace FuzzyGameEngine.Core
             log.AppendLine($"Час: {DateTime.Now:HH:mm:ss}");
 
             var f = Fuzzify(s);
+
             foreach (var item in f)
-                log.AppendLine($"  {item.Key,-18}: {item.Value:F3}");
+                log.AppendLine($" {item.Key,-18}: {item.Value:F3}");
 
             var output = new Dictionary<string, double>();
+
             var explain = new StringBuilder();
 
             foreach (var r in rules)
@@ -31,7 +33,7 @@ namespace FuzzyGameEngine.Core
                 double strength = r.Condition(f);
                 if (strength > 0.001)
                 {
-                    log.AppendLine($"  Правило «{r.Description}» → сила {strength:F3}");
+                    log.AppendLine($" Правило «{r.Description}» → сила {strength:F3}");
                     explain.AppendLine($"{r.Description}: {strength:F3}");
                 }
 
@@ -43,24 +45,27 @@ namespace FuzzyGameEngine.Core
 
             double result = adaptive.Apply(resultBefore);
             log.AppendLine($"Після адаптації: {result:F3}");
+
             log.AppendLine($"Адаптивний bias: {adaptive.GetBias():F3}");
 
             return (result, explain.ToString(), log.ToString());
         }
 
-        // ... Fuzzify та Defuzzify без змін (вже оптимальні)
-        private Dictionary<string, double> Fuzzify(GameState s) => new()
+        private static Dictionary<string, double> Fuzzify(GameState s)
         {
-            { "skill_high", Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
-            { "stress_high", Membership.Trap(s.StressLevel, 60, 80, 100, 100) },
-            { "health_low", Membership.Trap(s.Health, 0, 0, 30, 50) },
-            { "accuracy_high", Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
-            { "reaction_fast", Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
-            { "reaction_slow", Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
-            { "progress_late", Membership.Trap(s.Progress, 60, 80, 100, 100) }
-        };
+            return new()
+            {
+                { "skill_high", Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
+                { "stress_high", Membership.Trap(s.StressLevel, 60, 80, 100, 100) },
+                { "health_low", Membership.Trap(s.Health, 0, 0, 30, 50) },
+                { "accuracy_high", Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
+                { "reaction_fast", Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
+                { "reaction_slow", Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
+                { "progress_late", Membership.Trap(s.Progress, 60, 80, 100, 100) }
+            };
+        }
 
-        private double Defuzzify(Dictionary<string, double> o)
+        private static double Defuzzify(Dictionary<string, double> o)
         {
             double num = 0, den = 0;
             for (double x = 0; x <= 100; x += 1)
@@ -68,14 +73,12 @@ namespace FuzzyGameEngine.Core
                 double low = Membership.Trap(x, 0, 0, 30, 50);
                 double mid = Membership.Trap(x, 30, 50, 60, 80);
                 double high = Membership.Trap(x, 70, 85, 100, 100);
-
                 double mu = Math.Max(
                     Math.Min(low, o.GetValueOrDefault("low", 0)),
                     Math.Max(
                         Math.Min(mid, o.GetValueOrDefault("medium", 0)),
                         Math.Min(high, o.GetValueOrDefault("high", 0))
                     ));
-
                 num += x * mu;
                 den += mu;
             }

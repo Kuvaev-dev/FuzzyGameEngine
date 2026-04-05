@@ -9,7 +9,6 @@
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
-        <!-- Теми -->
         <SolidColorBrush x:Key="MainBackground" Color="#0F0F1A"/>
         <SolidColorBrush x:Key="MainForeground" Color="#E0E0FF"/>
         <SolidColorBrush x:Key="AccentBrush" Color="#00D4FF"/>
@@ -17,301 +16,372 @@
         <SolidColorBrush x:Key="DifficultyForeground" Color="#00FFBB"/>
         <SolidColorBrush x:Key="ConclusionForeground" Color="#FFCC33"/>
         <SolidColorBrush x:Key="LogBackground" Color="#112233"/>
+        <SolidColorBrush x:Key="LogForeground" Color="#B0E0FF"/>
         <SolidColorBrush x:Key="HistoryItemBackground" Color="#25253A"/>
+        <SolidColorBrush x:Key="ChartBackground" Color="#112233"/>
     </Window.Resources>
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- HEADER -->
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-            <TextBlock Text="🎮" FontSize="34" VerticalAlignment="Center" Margin="0,0,15,0"/>
-            <TextBlock Text="Нечітка система оцінки складності ігрового рівня"
-                       FontSize="26" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center"/>
+            <!-- HEADER -->
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <TextBlock Text="🎮" FontSize="34" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    <TextBlock Text="Нечітка система оцінки складності ігрового рівня"
+                               FontSize="26" FontWeight="Bold"
+                               Foreground="{DynamicResource AccentBrush}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Grid.Column="1" Margin="40,0,0,0">
+                    <RadioButton Content="Ручний режим"
+                                 IsChecked="{Binding IsManualMode}"
+                                 Foreground="{DynamicResource MainForeground}"
+                                 FontSize="15" Margin="0,0,45,0"/>
+                    <RadioButton Content="Автоматичний режим"
+                                 IsChecked="{Binding IsAutoMode}"
+                                 Foreground="{DynamicResource MainForeground}"
+                                 FontSize="15"/>
+                </StackPanel>
+                <Button Content="🌓 Змінити тему"
+                        Command="{Binding ToggleThemeCommand}"
+                        Grid.Column="2" Height="38" Width="160" FontSize="14"
+                        Background="{DynamicResource PanelBackground}"
+                        Foreground="{DynamicResource AccentBrush}"/>
+            </Grid>
 
-            <StackPanel Orientation="Horizontal" Margin="80,12,0,0">
-                <RadioButton Content="Ручний режим" 
-                             IsChecked="{Binding IsManualMode}"
-                             Foreground="{DynamicResource MainForeground}" FontSize="15" Margin="0,0,45,0"/>
-                <RadioButton Content="Автоматичний режим" 
-                             IsChecked="{Binding IsAutoMode}"
-                             Foreground="{DynamicResource MainForeground}" FontSize="15"/>
-            </StackPanel>
+            <!-- Основний контент -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" MinWidth="380" MaxWidth="520"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <Button Content="🌓 Змінити тему" 
-                    Command="{Binding ToggleThemeCommand}"
-                    Margin="60,0,0,0" Height="38" Width="150" FontSize="14"
-                    Background="{DynamicResource PanelBackground}" 
-                    Foreground="{DynamicResource AccentBrush}"/>
-        </StackPanel>
+                <!-- ЛІВА ПАНЕЛЬ -->
+                <GroupBox Header="Вхідні параметри рівня" FontSize="16"
+                          BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Margin="0,0,15,0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="18">
+                            <!-- 1. Час на рівні -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Час на рівні (с)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="300" Value="{Binding Time, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="480" MinWidth="400"/>
-                <ColumnDefinition Width="6"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                            <!-- 2. Кількість ворогів -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Кількість ворогів" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="50" Value="{Binding Enemies, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Enemies, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-            <!-- ЛІВА ПАНЕЛЬ – ПАРАМЕТРИ -->
-            <GroupBox Header="Вхідні параметри рівня" FontSize="16"
-                      BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Margin="0,0,15,0">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="18">
+                            <!-- 3. Здоров'я гравця -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Здоров'я гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Health, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Health, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 1. Час на рівні -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Час на рівні (с)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="300" Value="{Binding Time, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 4. Точність стрільби -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Точність стрільби (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Accuracy, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Accuracy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 2. Кількість ворогів -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Кількість ворогів" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="50" Value="{Binding Enemies, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Enemies, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 5. Пошкодження отримані -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Пошкодження отримані (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Damage, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Damage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 3. Здоров'я гравця -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Здоров'я гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding Health, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Health, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 6. Навичка гравця -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Навичка гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding PlayerSkill, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding PlayerSkill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 4. Точність стрільби -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Точність стрільби (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding Accuracy, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Accuracy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 7. Рівень стресу -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Рівень стресу (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding StressLevel, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding StressLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 5. Пошкодження отримані -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Пошкодження отримані (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding Damage, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Damage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 8. Прогрес рівня -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Прогрес рівня (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="100" Value="{Binding Progress, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding Progress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
 
-                        <!-- 6. Навичка гравця -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Навичка гравця (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding PlayerSkill, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding PlayerSkill, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                            <!-- 9. Час реакції -->
+                            <Grid Margin="0,9">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="85"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Час реакції (мс)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
+                                <Slider Minimum="0" Maximum="1000" Value="{Binding ReactionTime, Mode=TwoWay}"
+                                        IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
+                                <TextBox Text="{Binding ReactionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                         Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}"
+                                         Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}"
+                                         HorizontalContentAlignment="Center"
+                                         PreviewTextInput="NumericTextBox_PreviewTextInput"
+                                         DataObject.Pasting="NumericTextBox_Paste"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
 
-                        <!-- 7. Рівень стресу -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Рівень стресу (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding StressLevel, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding StressLevel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                <GridSplitter Grid.Column="1" Width="8"
+                              Background="{DynamicResource AccentBrush}"
+                              VerticalAlignment="Stretch"
+                              HorizontalAlignment="Center"
+                              Opacity="0.7"
+                              ResizeBehavior="PreviousAndNext"/>
 
-                        <!-- 8. Прогрес рівня -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Прогрес рівня (%)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="100" Value="{Binding Progress, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding Progress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                <!-- ПРАВА ПАНЕЛЬ -->
+                <ScrollViewer Grid.Column="2" Margin="12,0,0,0"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+                        <!-- РЕЗУЛЬТАТ -->
+                        <Border Background="{DynamicResource PanelBackground}" CornerRadius="16" Padding="32" Margin="0,0,0,18"
+                                BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="СКЛАДНІСТЬ РІВНЯ" 
+                                           FontSize="19" 
+                                           FontWeight="Bold"
+                                           Foreground="{DynamicResource DifficultyForeground}" 
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding DifficultyValue, StringFormat={}{0:F1}}"
+                                           FontSize="78" FontWeight="Bold" Foreground="{DynamicResource DifficultyForeground}"
+                                           HorizontalAlignment="Center"/>
+                                <TextBlock Text="{Binding ShortConclusion}"
+                                           FontSize="26"
+                                           Foreground="{DynamicResource ConclusionForeground}"
+                                           HorizontalAlignment="Center"
+                                           FontWeight="Bold"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
 
-                        <!-- 9. Час реакції -->
-                        <Grid Margin="0,9">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230"/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="85"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Час реакції (мс)" VerticalAlignment="Center" Foreground="{DynamicResource MainForeground}"/>
-                            <Slider Minimum="0" Maximum="1000" Value="{Binding ReactionTime, Mode=TwoWay}" 
-                                    IsEnabled="{Binding IsManualMode}" Grid.Column="1"/>
-                            <TextBox Text="{Binding ReactionTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                     Grid.Column="2" Width="75" Background="{DynamicResource PanelBackground}" 
-                                     Foreground="{DynamicResource MainForeground}" BorderBrush="{DynamicResource AccentBrush}" 
-                                     HorizontalContentAlignment="Center"/>
-                        </Grid>
+                        <!-- КНОПКИ -->
+                        <UniformGrid Rows="1" Columns="6" Margin="0,0,0,18">
+                            <Button Content="📊 Розрахувати" Command="{Binding CalculateCommand}"
+                                    IsEnabled="{Binding IsManualMode}" Height="52" FontSize="15"
+                                    Background="{DynamicResource PanelBackground}" Foreground="{DynamicResource AccentBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}"/>
+                            <Button Content="🎲 Симуляція" Command="{Binding SimulateCommand}"
+                                    Height="52" FontSize="15" Background="{DynamicResource PanelBackground}"
+                                    Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
+                            <Button Content="🗑️ Очистити історію" Command="{Binding ClearHistoryCommand}"
+                                    Height="52" FontSize="15" Background="{DynamicResource PanelBackground}"
+                                    Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
+                            <Button Content="🔄 Очистити значення" Command="{Binding ClearValuesCommand}"
+                                    Height="52" FontSize="15" Background="{DynamicResource PanelBackground}"
+                                    Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
+                            <Button Content="💾 Зберегти CSV" Command="{Binding SaveCommand}"
+                                    Height="52" FontSize="15" Background="{DynamicResource PanelBackground}"
+                                    Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
+                            <Button Content="📂 Завантажити CSV" Command="{Binding LoadFileCommand}"
+                                    Height="52" FontSize="15" Background="{DynamicResource PanelBackground}"
+                                    Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
+                        </UniformGrid>
 
+                        <!-- TABCONTROL -->
+                        <TabControl Background="Transparent" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1"
+                                    SelectionChanged="TabControl_SelectionChanged">
+                            <!-- Історія розрахунків -->
+                            <TabItem Header="Історія розрахунків">
+                                <Grid>
+                                    <ListBox x:Name="HistoryListBox"
+                                             ItemsSource="{Binding History}"
+                                             SelectedItem="{Binding SelectedHistoryEntry}"
+                                             Margin="6" Background="{DynamicResource PanelBackground}"
+                                             MouseDoubleClick="HistoryListBox_MouseDoubleClick">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding DisplayText}" Padding="10" FontSize="15"
+                                                           Foreground="{DynamicResource MainForeground}"
+                                                           Background="{DynamicResource HistoryItemBackground}"
+                                                           Margin="3,2"/>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <Button Content="Завантажити вибране в параметри"
+                                            Command="{Binding LoadHistoryCommand}"
+                                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                            Margin="12" Height="40" FontSize="14"
+                                            Background="{DynamicResource PanelBackground}"
+                                            Foreground="{DynamicResource AccentBrush}"/>
+                                </Grid>
+                            </TabItem>
+
+                            <!-- Детальний лог -->
+                            <TabItem Header="Детальний лог">
+                                <ListBox ItemsSource="{Binding LogEntries}" Margin="6"
+                                         Background="{DynamicResource LogBackground}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" TextWrapping="Wrap"
+                                                       FontFamily="Consolas" Padding="12" FontSize="13.5"
+                                                       Foreground="{DynamicResource LogForeground}"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </TabItem>
+
+                            <!-- Графіки -->
+                            <TabItem Header="Графіки">
+                                <StackPanel>
+                                    <TextBlock Text="📈 Складність рівня (0 — 100)"
+                                               Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="12,12,12,6"/>
+                                    <Border Background="{DynamicResource ChartBackground}" BorderBrush="{DynamicResource AccentBrush}"
+                                            BorderThickness="2" Margin="12,0,12,12">
+                                        <Canvas x:Name="DifficultyCanvas" MinHeight="180" SizeChanged="Canvas_SizeChanged"/>
+                                    </Border>
+                                    <TextBlock Text="📈 Адаптивний bias (0.7 — 1.3)"
+                                               Foreground="#FFAA44" FontWeight="Bold" Margin="12,8,12,6"/>
+                                    <Border Background="{DynamicResource ChartBackground}" BorderBrush="{DynamicResource AccentBrush}"
+                                            BorderThickness="2" Margin="12,0,12,12">
+                                        <Canvas x:Name="BiasCanvas" MinHeight="180" SizeChanged="Canvas_SizeChanged"/>
+                                    </Border>
+                                    <!-- Висновок -->
+                                    <Border Background="{DynamicResource PanelBackground}" CornerRadius="16" Padding="28" Margin="12,0,12,12"
+                                            BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2">
+                                        <StackPanel HorizontalAlignment="Center" MaxWidth="1000">
+                                            <TextBlock Text="ВИСНОВОК ЩОДО СКЛАДНОСТІ РІВНЯ"
+                                                       FontSize="18" FontWeight="Bold"
+                                                       Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+                                            <TextBlock Text="{Binding DifficultyValue, StringFormat={}{Складність: {0:F1}}}"
+                                                       FontSize="42" FontWeight="Bold"
+                                                       Foreground="{DynamicResource DifficultyForeground}"
+                                                       HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DetailedConclusion}"
+                                                       FontSize="24"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource ConclusionForeground}"
+                                                       HorizontalAlignment="Center"
+                                                       TextWrapping="Wrap"
+                                                       TextAlignment="Center"
+                                                       MaxWidth="900"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
                     </StackPanel>
                 </ScrollViewer>
-            </GroupBox>
-
-            <!-- GridSplitter -->
-            <GridSplitter Grid.Column="1" Width="6" Background="{DynamicResource AccentBrush}" 
-                          VerticalAlignment="Stretch" HorizontalAlignment="Center" Opacity="0.7"/>
-
-            <!-- ПРАВА ПАНЕЛЬ -->
-            <StackPanel Grid.Column="2">
-
-                <!-- РЕЗУЛЬТАТ -->
-                <Border Background="{DynamicResource PanelBackground}" CornerRadius="16" Padding="32" Margin="0,0,0,18"
-                        BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2">
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock Text="СКЛАДНІСТЬ РІВНЯ" FontSize="19" Foreground="#88FF88" HorizontalAlignment="Center"/>
-                        <TextBlock Text="{Binding DifficultyValue, StringFormat={}{0:F1}}"
-                                   FontSize="78" FontWeight="Bold" Foreground="{DynamicResource DifficultyForeground}" 
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="{Binding Conclusion}" FontSize="25" 
-                                   Foreground="{DynamicResource ConclusionForeground}" HorizontalAlignment="Center" 
-                                   FontWeight="SemiBold"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- КНОПКИ -->
-                <UniformGrid Rows="1" Columns="5" Margin="0,0,0,18">
-                    <Button Content="Розрахувати" Command="{Binding CalculateCommand}" 
-                            IsEnabled="{Binding IsManualMode}" Height="52" FontSize="15"
-                            Background="{DynamicResource PanelBackground}" Foreground="{DynamicResource AccentBrush}" 
-                            BorderBrush="{DynamicResource AccentBrush}"/>
-                    <Button Content="Симуляція" Command="{Binding SimulateCommand}" 
-                            Height="52" FontSize="15" Background="{DynamicResource PanelBackground}" 
-                            Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
-                    <Button Content="Очистити" Command="{Binding ClearCommand}" 
-                            Height="52" FontSize="15" Background="{DynamicResource PanelBackground}" 
-                            Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
-                    <Button Content="💾 Зберегти CSV" Command="{Binding SaveCommand}" 
-                            Height="52" FontSize="15" Background="{DynamicResource PanelBackground}" 
-                            Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
-                    <Button Content="📂 Завантажити CSV" Command="{Binding LoadFileCommand}" 
-                            Height="52" FontSize="15" Background="{DynamicResource PanelBackground}" 
-                            Foreground="{DynamicResource AccentBrush}" BorderBrush="{DynamicResource AccentBrush}"/>
-                </UniformGrid>
-
-                <!-- TABCONTROL -->
-                <TabControl Background="Transparent" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
-
-                    <!-- ІСТОРІЯ -->
-                    <TabItem Header="Історія розрахунків">
-                        <Grid>
-                            <ListBox x:Name="HistoryListBox" 
-                                     ItemsSource="{Binding History}"
-                                     SelectedItem="{Binding SelectedHistoryEntry}"
-                                     Margin="6" Background="{DynamicResource PanelBackground}"
-                                     MouseDoubleClick="HistoryListBox_MouseDoubleClick">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding DisplayText}" Padding="10" FontSize="15"
-                                                   Foreground="{DynamicResource MainForeground}" 
-                                                   Background="{DynamicResource HistoryItemBackground}" 
-                                                   Margin="3,2"/>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <Button Content="Завантажити вибране в параметри"
-                                    Command="{Binding LoadHistoryCommand}"
-                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                    Margin="12" Height="40" FontSize="14"
-                                    Background="{DynamicResource PanelBackground}" 
-                                    Foreground="{DynamicResource AccentBrush}"/>
-                        </Grid>
-                    </TabItem>
-
-                    <!-- ДЕТАЛЬНИЙ ЛОГ -->
-                    <TabItem Header="Детальний лог">
-                        <ListBox ItemsSource="{Binding LogEntries}" Margin="6" Background="{DynamicResource LogBackground}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" TextWrapping="Wrap"
-                                               FontFamily="Consolas" Padding="12" FontSize="13.5"
-                                               Foreground="#B0E0FF"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </TabItem>
-
-                    <!-- ГРАФІКИ -->
-                    <TabItem Header="Графіки">
-                        <StackPanel>
-                            <TextBlock Text="📈 Складність рівня (0 — 100)" 
-                                       Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="12,12,12,6"/>
-                            <Border Background="#112233" BorderBrush="{DynamicResource AccentBrush}" 
-                                    BorderThickness="2" Margin="12,0,12,12">
-                                <Canvas x:Name="DifficultyCanvas" Height="180" SizeChanged="Canvas_SizeChanged"/>
-                            </Border>
-
-                            <TextBlock Text="📈 Адаптивний bias (0.7 — 1.3)" 
-                                       Foreground="#FFAA44" FontWeight="Bold" Margin="12,8,12,6"/>
-                            <Border Background="#112233" BorderBrush="{DynamicResource AccentBrush}" 
-                                    BorderThickness="2" Margin="12,0,12,12">
-                                <Canvas x:Name="BiasCanvas" Height="180" SizeChanged="Canvas_SizeChanged"/>
-                            </Border>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
-            </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </ScrollViewer>
 </Window>

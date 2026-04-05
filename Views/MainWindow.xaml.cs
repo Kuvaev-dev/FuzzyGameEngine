@@ -1,5 +1,4 @@
 ﻿using FuzzyGameEngine.ViewModels;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
@@ -22,7 +21,6 @@ namespace FuzzyGameEngine.Views
             vm.ChartData.CollectionChanged += (_, _) => DrawCharts();
             vm.BiasHistory.CollectionChanged += (_, _) => DrawCharts();
             vm.PropertyChanged += Vm_PropertyChanged;
-
             Loaded += (_, _) => DrawCharts();
 
             vm.PropertyChanged += (s, e) =>
@@ -43,16 +41,16 @@ namespace FuzzyGameEngine.Views
         private void ApplyTheme()
         {
             bool dark = vm.IsDarkTheme;
-
             Resources["MainBackground"] = new SolidColorBrush(dark ? Color.FromRgb(15, 15, 26) : Color.FromRgb(245, 247, 250));
             Resources["MainForeground"] = new SolidColorBrush(dark ? Color.FromRgb(224, 224, 255) : Color.FromRgb(30, 35, 45));
             Resources["PanelBackground"] = new SolidColorBrush(dark ? Color.FromRgb(26, 26, 46) : Color.FromRgb(255, 255, 255));
-            Resources["ChartBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
             Resources["HistoryItemBackground"] = new SolidColorBrush(dark ? Color.FromRgb(37, 37, 58) : Color.FromRgb(248, 250, 252));
-            Resources["ResultValueBrush"] = new SolidColorBrush(dark ? Color.FromRgb(0, 255, 187) : Color.FromRgb(0, 180, 130));
-            Resources["ConclusionBrush"] = new SolidColorBrush(dark ? Color.FromRgb(255, 204, 51) : Color.FromRgb(200, 140, 0));
-            Resources["LogForeground"] = new SolidColorBrush(dark ? Color.FromRgb(176, 224, 255) : Color.FromRgb(30, 30, 40));
+            Resources["DifficultyForeground"] = new SolidColorBrush(dark ? Color.FromRgb(0, 255, 187) : Color.FromRgb(0, 180, 130));
+            Resources["ConclusionForeground"] = new SolidColorBrush(dark ? Color.FromRgb(255, 204, 51) : Color.FromRgb(200, 140, 0));
             Resources["AccentBrush"] = new SolidColorBrush(dark ? Color.FromRgb(0, 212, 255) : Color.FromRgb(0, 119, 204));
+            Resources["LogBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
+            Resources["LogForeground"] = new SolidColorBrush(dark ? Color.FromRgb(176, 224, 255) : Color.FromRgb(30, 30, 40));
+            Resources["ChartBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
         }
 
         private void HistoryListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -65,8 +63,31 @@ namespace FuzzyGameEngine.Views
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count > 0 && ((TabItem)e.AddedItems[0]).Header.ToString() == "Графіки")
+            if (e.AddedItems.Count == 0) return;
+            if (e.AddedItems[0] is not TabItem tabItem) return;
+            if (tabItem.Header.ToString() == "Графіки")
                 DrawCharts();
+        }
+
+        private void NumericTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !char.IsDigit(e.Text[0]);
+        }
+
+        private void NumericTextBox_Paste(object sender, DataObjectPastingEventArgs e)
+        {
+            if (!e.DataObject.GetDataPresent(typeof(string)))
+            {
+                e.CancelCommand();
+                return;
+            }
+
+            string pastedText = (string)e.DataObject.GetData(typeof(string)) ?? string.Empty;
+
+            if (!pastedText.All(char.IsDigit))
+            {
+                e.CancelCommand();
+            }
         }
 
         private void DrawCharts()
@@ -75,16 +96,15 @@ namespace FuzzyGameEngine.Views
             DrawLineChart(BiasCanvas, vm.BiasHistory, vm.IsDarkTheme ? Colors.Orange : Colors.DarkOrange, 0.7, 1.3, "Адаптивний bias");
         }
 
-        private void DrawLineChart(Canvas canvas, ObservableCollection<double> data, Color lineColor,
+        private static void DrawLineChart(Canvas canvas, ObservableCollection<double> data, Color lineColor,
                                    double minVal, double maxVal, string title)
         {
             canvas.Children.Clear();
+
             if (data.Count < 2)
             {
-                // Початкові точки, якщо даних ще немає
                 var tb = new TextBlock { Text = "Немає даних для графіка", Foreground = Brushes.Gray, FontSize = 14 };
-                Canvas.SetLeft(tb, 20);
-                Canvas.SetTop(tb, 80);
+                Canvas.SetLeft(tb, 20); Canvas.SetTop(tb, 80);
                 canvas.Children.Add(tb);
                 return;
             }
@@ -93,15 +113,15 @@ namespace FuzzyGameEngine.Views
             double h = canvas.ActualHeight > 10 ? canvas.ActualHeight : 200;
             double step = w / (data.Count - 1);
 
-            // Сітка
+            // сітка
             for (int i = 1; i < 5; i++)
             {
                 double y = h * i / 5;
                 canvas.Children.Add(new Line { X1 = 0, X2 = w, Y1 = y, Y2 = y, Stroke = Brushes.Gray, StrokeThickness = 1, Opacity = 0.25 });
             }
 
-            // Лінійний графік + маркери
             var poly = new Polyline { Stroke = new SolidColorBrush(lineColor), StrokeThickness = 5, StrokeLineJoin = PenLineJoin.Round };
+
             for (int i = 0; i < data.Count; i++)
             {
                 double x = i * step;
@@ -115,9 +135,10 @@ namespace FuzzyGameEngine.Views
                 Canvas.SetTop(dot, y - 5);
                 canvas.Children.Add(dot);
             }
+
             canvas.Children.Add(poly);
 
-            // Підписи по Y
+            // підписи по осі Y
             for (int i = 0; i <= 4; i++)
             {
                 double val = maxVal - (maxVal - minVal) * i / 4;
@@ -127,7 +148,7 @@ namespace FuzzyGameEngine.Views
                 canvas.Children.Add(tb);
             }
 
-            // Останнє значення
+            // значення останньої точки
             double lastVal = data[^1];
             double lastX = (data.Count - 1) * step;
             double lastY = h * (1 - (lastVal - minVal) / (maxVal - minVal));
@@ -147,7 +168,7 @@ namespace FuzzyGameEngine.Views
             Canvas.SetTop(lastTb, lastY - 26);
             canvas.Children.Add(lastTb);
 
-            // Заголовок
+            // заголовок графіка
             var titleTb = new TextBlock { Text = title, Foreground = new SolidColorBrush(lineColor), FontWeight = FontWeights.Bold, FontSize = 14 };
             Canvas.SetLeft(titleTb, w / 2 - 80);
             Canvas.SetTop(titleTb, -26);
