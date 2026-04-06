@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -41,6 +42,7 @@ namespace FuzzyGameEngine.Views
         private void ApplyTheme()
         {
             bool dark = vm.IsDarkTheme;
+
             Resources["MainBackground"] = new SolidColorBrush(dark ? Color.FromRgb(15, 15, 26) : Color.FromRgb(245, 247, 250));
             Resources["MainForeground"] = new SolidColorBrush(dark ? Color.FromRgb(224, 224, 255) : Color.FromRgb(30, 35, 45));
             Resources["PanelBackground"] = new SolidColorBrush(dark ? Color.FromRgb(26, 26, 46) : Color.FromRgb(255, 255, 255));
@@ -51,6 +53,8 @@ namespace FuzzyGameEngine.Views
             Resources["LogBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
             Resources["LogForeground"] = new SolidColorBrush(dark ? Color.FromRgb(176, 224, 255) : Color.FromRgb(30, 30, 40));
             Resources["ChartBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
+
+            DrawCharts();
         }
 
         private void HistoryListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -76,15 +80,9 @@ namespace FuzzyGameEngine.Views
 
         private void NumericTextBox_Paste(object sender, DataObjectPastingEventArgs e)
         {
-            if (!e.DataObject.GetDataPresent(typeof(string)))
-            {
-                e.CancelCommand();
-                return;
-            }
-
-            string pastedText = (string)e.DataObject.GetData(typeof(string)) ?? string.Empty;
-            if (!pastedText.All(char.IsDigit))
-                e.CancelCommand();
+            if (!e.DataObject.GetDataPresent(typeof(string))) { e.CancelCommand(); return; }
+            string pasted = (string)e.DataObject.GetData(typeof(string)) ?? string.Empty;
+            if (!pasted.All(char.IsDigit)) e.CancelCommand();
         }
 
         private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -92,21 +90,27 @@ namespace FuzzyGameEngine.Views
             if (sender is Slider slider)
             {
                 double rounded = Math.Round(slider.Value);
-                if (slider.Value != rounded)
+                if (Math.Abs(slider.Value - rounded) > 0.001)
                     slider.Value = rounded;
             }
         }
 
         private void DrawCharts()
         {
-            DrawLineChart(DifficultyCanvas, vm.ChartData, vm.IsDarkTheme ? Colors.Cyan : Colors.DodgerBlue, 0, 100, "Складність рівня");
-            DrawLineChart(BiasCanvas, vm.BiasHistory, vm.IsDarkTheme ? Colors.Orange : Colors.DarkOrange, 0.7, 1.3, "Адаптивний bias");
+            bool dark = vm.IsDarkTheme;
+
+            Color difficultyColor = dark ? Colors.Cyan : Color.FromRgb(0, 140, 255);
+            DrawLineChart(DifficultyCanvas, vm.ChartData, difficultyColor, 0, 100, "Складність рівня", "Складність: ");
+
+            Color biasColor = dark ? Colors.Orange : Color.FromRgb(220, 50, 0);
+            DrawLineChart(BiasCanvas, vm.BiasHistory, biasColor, 0.7, 1.3, "Адаптивний bias", "Bias: ");
         }
 
         private static void DrawLineChart(Canvas canvas, ObservableCollection<double> data, Color lineColor,
-                                          double minVal, double maxVal, string title)
+                                          double minVal, double maxVal, string title, string valuePrefix)
         {
             canvas.Children.Clear();
+
             if (data.Count < 2)
             {
                 var tb = new TextBlock { Text = "Немає даних для графіка", Foreground = Brushes.Gray, FontSize = 14 };
@@ -122,29 +126,73 @@ namespace FuzzyGameEngine.Views
             for (int i = 1; i < 5; i++)
             {
                 double y = h * i / 5;
-                canvas.Children.Add(new Line { X1 = 0, X2 = w, Y1 = y, Y2 = y, Stroke = Brushes.Gray, StrokeThickness = 1, Opacity = 0.25 });
+                canvas.Children.Add(new Line
+                {
+                    X1 = 0,
+                    X2 = w,
+                    Y1 = y,
+                    Y2 = y,
+                    Stroke = Brushes.Gray,
+                    StrokeThickness = 1,
+                    Opacity = 0.25
+                });
             }
 
-            var poly = new Polyline { Stroke = new SolidColorBrush(lineColor), StrokeThickness = 5, StrokeLineJoin = PenLineJoin.Round };
+            var poly = new Polyline
+            {
+                Stroke = new SolidColorBrush(lineColor),
+                StrokeThickness = 6,
+                StrokeLineJoin = PenLineJoin.Round
+            };
 
             for (int i = 0; i < data.Count; i++)
             {
                 double x = i * step;
                 double norm = (data[i] - minVal) / (maxVal - minVal);
                 double y = h * (1 - norm);
+
                 poly.Points.Add(new Point(x, y));
 
-                var dot = new Ellipse { Width = 10, Height = 10, Fill = new SolidColorBrush(lineColor) };
-                Canvas.SetLeft(dot, x - 5);
-                Canvas.SetTop(dot, y - 5);
+                var dot = new Ellipse
+                {
+                    Width = 18,
+                    Height = 18,
+                    Fill = new SolidColorBrush(lineColor),
+                    Stroke = Brushes.White,
+                    StrokeThickness = 3,
+                    IsHitTestVisible = true,
+                    Cursor = Cursors.Hand
+                };
+
+                ToolTipService.SetToolTip(dot, new ToolTip
+                {
+                    Content = $"{valuePrefix}{data[i]:F2}",
+                    Background = new SolidColorBrush(Color.FromRgb(30, 30, 40)),
+                    Foreground = Brushes.White,
+                    Padding = new Thickness(10, 6, 10, 6),
+                    FontSize = 13.5,
+                    Placement = PlacementMode.MousePoint
+                });
+
+                Canvas.SetZIndex(dot, 10);
+
+                Canvas.SetLeft(dot, x - 9);
+                Canvas.SetTop(dot, y - 9);
                 canvas.Children.Add(dot);
             }
+
             canvas.Children.Add(poly);
 
             for (int i = 0; i <= 4; i++)
             {
                 double val = maxVal - (maxVal - minVal) * i / 4;
-                var tb = new TextBlock { Text = val.ToString("F1"), Foreground = Brushes.Gray, FontSize = 12, FontWeight = FontWeights.Medium };
+                var tb = new TextBlock
+                {
+                    Text = val.ToString("F1"),
+                    Foreground = Brushes.Gray,
+                    FontSize = 12,
+                    FontWeight = FontWeights.Medium
+                };
                 Canvas.SetLeft(tb, 10);
                 Canvas.SetTop(tb, h * i / 4 - 8);
                 canvas.Children.Add(tb);
@@ -161,14 +209,22 @@ namespace FuzzyGameEngine.Views
                 FontSize = 14,
                 FontWeight = FontWeights.Bold
             };
+
             double labelX = lastX + 12;
-            if (labelX + 70 > w) labelX = lastX - 70;
+            if (labelX + 80 > w) labelX = lastX - 80;
             Canvas.SetLeft(lastTb, labelX);
-            Canvas.SetTop(lastTb, lastY - 26);
+            Canvas.SetTop(lastTb, lastY - 28);
             canvas.Children.Add(lastTb);
 
-            var titleTb = new TextBlock { Text = title, Foreground = new SolidColorBrush(lineColor), FontWeight = FontWeights.Bold, FontSize = 14 };
-            Canvas.SetLeft(titleTb, w / 2 - 80);
+            // Заголовок
+            var titleTb = new TextBlock
+            {
+                Text = title,
+                Foreground = new SolidColorBrush(lineColor),
+                FontWeight = FontWeights.Bold,
+                FontSize = 14
+            };
+            Canvas.SetLeft(titleTb, w / 2 - 90);
             Canvas.SetTop(titleTb, -26);
             canvas.Children.Add(titleTb);
         }
