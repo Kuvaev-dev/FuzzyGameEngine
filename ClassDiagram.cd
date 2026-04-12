@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="FuzzyGameEngine.Core.AdaptiveController">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABBABAAEAAAAAIAAAAABAAAAQAAAAgAAAAgA=</HashCode>
+      <FileName>Core\AdaptiveController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.Core.EngineFactory">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\EngineFactory.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.Core.FuzzyEngine">
+    <Position X="8.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAICAAAAAAQAAAAAAgAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\FuzzyEngine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.Core.GameState">
+    <Position X="3" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAACAAACAAgAAAAAAQIAAAAAAEAAAAAAAAAAACAAQA=</HashCode>
+      <FileName>Core\GameState.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.Core.Membership">
+    <Position X="4.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Membership.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.Core.Rule">
+    <Position X="10" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACgAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Core\Rule.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.ViewModels.HistoryEntry">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIABCACAAQAgAAAAAAQKAAAARAEAAAAAAAAAAACAAQI=</HashCode>
+      <FileName>ViewModels\HistoryEntry.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FuzzyGameEngine.ViewModels.MainViewModel">
+    <Position X="1.25" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>BoQBCoCAgRAwgR0AOgSJAEgIQUEAwAAJAoQCAgSUlwo=</HashCode>
+      <FileName>ViewModels\MainViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FuzzyGameEngine.ViewModels.Base.BaseViewModel">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAABAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\Base\BaseViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="FuzzyGameEngine.ViewModels.Base.RelayCommand" BaseTypeListCollapsed="true">
+    <Position X="8.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAQAAEAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModels\Base\RelayCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="FuzzyGameEngine.Views.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="6.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAABAAgAABAACBBAAQAEAAAAAAAAAAAAAAABIA=</HashCode>
+      <FileName>Views\MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
