@@ -55,13 +55,16 @@ namespace FuzzyGameEngine.Core
         {
             return new()
             {
-                { "skill_high", Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
-                { "stress_high", Membership.Trap(s.StressLevel, 60, 80, 100, 100) },
-                { "health_low", Membership.Trap(s.Health, 0, 0, 30, 50) },
-                { "accuracy_high", Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
-                { "reaction_fast", Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
-                { "reaction_slow", Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
-                { "progress_late", Membership.Trap(s.Progress, 60, 80, 100, 100) }
+                { "skill_high",      Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
+                { "stress_high",     Membership.Trap(s.StressLevel, 60, 80, 100, 100) },
+                { "health_low",      Membership.Trap(s.Health, 0, 0, 30, 50) },
+                { "accuracy_high",   Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
+                { "reaction_fast",   Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
+                { "reaction_slow",   Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
+                { "progress_late",   Membership.Trap(s.Progress, 60, 80, 100, 100) },
+                { "time_long",       Membership.Trap(s.Time, 150, 200, 300, 300) },     
+                { "enemies_many",    Membership.Trap(s.Enemies, 10, 20, 40, 50) },      
+                { "damage_high",     Membership.Trap(s.DamageTaken, 40, 60, 90, 100) }  
             };
         }
 
