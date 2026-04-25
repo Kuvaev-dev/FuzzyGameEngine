@@ -55,6 +55,7 @@ namespace FuzzyGameEngine.Views
             Resources["ChartBackground"] = new SolidColorBrush(dark ? Color.FromRgb(17, 34, 51) : Color.FromRgb(240, 245, 255));
 
             DrawCharts();
+            DrawMembershipFunctions();
         }
 
         private void HistoryListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -227,6 +228,52 @@ namespace FuzzyGameEngine.Views
             Canvas.SetLeft(titleTb, w / 2 - 90);
             Canvas.SetTop(titleTb, -26);
             canvas.Children.Add(titleTb);
+        }
+
+        private void FunctionsCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawMembershipFunctions();
+        }
+
+        private void DrawMembershipFunctions()
+        {
+            if (CanvasTrap == null || CanvasTri == null || CanvasGauss == null) return;
+
+            Color lineColor = vm.IsDarkTheme ? Colors.Cyan : Color.FromRgb(0, 140, 255);
+
+            // Малюємо Трапецію: Membership.Trap(x, 20, 40, 60, 80)
+            DrawFunction(CanvasTrap, lineColor, x => FuzzyGameEngine.Core.Membership.Trap(x, 20, 40, 60, 80));
+
+            // Малюємо Трикутник: Membership.Tri(x, 20, 50, 80)
+            DrawFunction(CanvasTri, lineColor, x => FuzzyGameEngine.Core.Membership.Tri(x, 20, 50, 80));
+
+            // Малюємо Гаусса: Membership.Gauss(x, 50, 15)
+            DrawFunction(CanvasGauss, lineColor, x => FuzzyGameEngine.Core.Membership.Gauss(x, 50, 15));
+        }
+
+        private void DrawFunction(Canvas canvas, Color color, Func<double, double> func)
+        {
+            canvas.Children.Clear();
+            double w = canvas.ActualWidth > 10 ? canvas.ActualWidth : 500;
+            double h = canvas.ActualHeight > 10 ? canvas.ActualHeight : 150;
+
+            var poly = new Polyline
+            {
+                Stroke = new SolidColorBrush(color),
+                StrokeThickness = 4,
+                StrokeLineJoin = PenLineJoin.Round
+            };
+
+            // Будуємо графік від 0 до 100
+            for (double x = 0; x <= 100; x += 1)
+            {
+                double yValue = func(x); // значення від 0 до 1
+                double canvasX = (x / 100.0) * w;
+                double canvasY = h - (yValue * (h - 20)) - 10; // відступи
+                poly.Points.Add(new Point(canvasX, canvasY));
+            }
+
+            canvas.Children.Add(poly);
         }
     }
 }

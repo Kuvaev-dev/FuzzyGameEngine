@@ -43,6 +43,8 @@ namespace FuzzyGameEngine.Core
             double resultBefore = Defuzzify(output);
             log.AppendLine($"До адаптації: {resultBefore:F3}");
 
+            adaptive.Learn(resultBefore);
+
             double result = adaptive.Apply(resultBefore);
             log.AppendLine($"Після адаптації: {result:F3}");
 
@@ -56,22 +58,22 @@ namespace FuzzyGameEngine.Core
             return new()
             {
                 { "skill_high",      Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
-                { "stress_high",     Membership.Trap(s.StressLevel, 60, 80, 100, 100) },
-                { "health_low",      Membership.Trap(s.Health, 0, 0, 30, 50) },
                 { "accuracy_high",   Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
                 { "reaction_fast",   Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
                 { "reaction_slow",   Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
                 { "progress_late",   Membership.Trap(s.Progress, 60, 80, 100, 100) },
-                { "time_long",       Membership.Trap(s.Time, 150, 200, 300, 300) },     
-                { "enemies_many",    Membership.Trap(s.Enemies, 10, 20, 40, 50) },      
-                { "damage_high",     Membership.Trap(s.DamageTaken, 40, 60, 90, 100) }  
+                { "time_long",       Membership.Trap(s.Time, 150, 200, 300, 300) },
+                { "enemies_many",    Membership.Trap(s.Enemies, 10, 20, 40, 50) },
+                { "damage_high",     Membership.Trap(s.DamageTaken, 40, 60, 90, 100) },
+                { "stress_high",     Membership.Gauss(s.StressLevel, 100, 20) }, 
+                { "health_low",      Membership.Tri(s.Health, -1, 0, 50) }
             };
         }
 
         private static double Defuzzify(Dictionary<string, double> o)
         {
             double num = 0, den = 0;
-            for (double x = 0; x <= 100; x += 1)
+            for (double x = 0; x <= 100; x += 0.5)
             {
                 double low = Membership.Trap(x, 0, 0, 30, 50);
                 double mid = Membership.Trap(x, 30, 50, 60, 80);

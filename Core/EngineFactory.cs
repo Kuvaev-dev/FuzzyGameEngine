@@ -10,7 +10,7 @@
                 new Rule(x => Math.Min(x["reaction_fast"], x["skill_high"]), "high", "Швидка реакція"),
                 new Rule(x => Math.Min(x["reaction_slow"], x["stress_high"]), "low", "Повільно + стрес"),
                 new Rule(x => x["progress_late"], "high", "Пізній етап"),
-                new Rule(x => 0.5, "medium", "Базове правило"),
+                new Rule(x => 0.2, "medium", "Базове правило"),
                 new Rule(x => x["enemies_many"], "high", "Багато ворогів"),
                 new Rule(x => x["damage_high"], "high", "Високі пошкодження"),
                 new Rule(x => x["time_long"], "low", "Багато часу на рівень"), 

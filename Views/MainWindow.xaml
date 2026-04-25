@@ -389,6 +389,27 @@
                                     </Border>
                                 </StackPanel>
                             </TabItem>
+
+                            <TabItem Header="Функції належності">
+                                <ScrollViewer>
+                                    <StackPanel Margin="12">
+                                        <TextBlock Text="Трапецієподібна функція" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,5"/>
+                                        <Border Background="{DynamicResource ChartBackground}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Height="150">
+                                            <Canvas x:Name="CanvasTrap" SizeChanged="FunctionsCanvas_SizeChanged"/>
+                                        </Border>
+
+                                        <TextBlock Text="Трикутна функція" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,15,0,5"/>
+                                        <Border Background="{DynamicResource ChartBackground}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Height="150">
+                                            <Canvas x:Name="CanvasTri" SizeChanged="FunctionsCanvas_SizeChanged"/>
+                                        </Border>
+
+                                        <TextBlock Text="Функція Гаусса" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,15,0,5"/>
+                                        <Border Background="{DynamicResource ChartBackground}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="2" Height="150">
+                                            <Canvas x:Name="CanvasGauss" SizeChanged="FunctionsCanvas_SizeChanged"/>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </TabItem>
                         </TabControl>
                     </StackPanel>
                 </ScrollViewer>

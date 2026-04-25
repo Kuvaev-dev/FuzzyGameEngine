@@ -15,13 +15,14 @@
         public void Learn(double performance)
         {
             history.Enqueue(performance);
-
             if (history.Count > HistorySize) history.Dequeue();
 
             double avg = history.Any() ? history.Average() : 50;
 
-            if (avg > 70) bias += BiasStep;
-            else if (avg < 40) bias -= BiasStep;
+            if (avg > 70)
+                bias -= BiasStep;
+            else if (avg < 40)
+                bias += BiasStep;
 
             bias = Math.Clamp(bias, MinBias, MaxBias);
         }
