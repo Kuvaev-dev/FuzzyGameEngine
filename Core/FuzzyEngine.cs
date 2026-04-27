@@ -59,14 +59,14 @@ namespace FuzzyGameEngine.Core
             {
                 { "skill_high",      Membership.Trap(s.PlayerSkill, 60, 75, 100, 100) },
                 { "accuracy_high",   Membership.Trap(s.Accuracy, 70, 85, 100, 100) },
-                { "reaction_fast",   Membership.Trap(s.ReactionTime, 0, 0, 200, 400) },
+                { "reaction_fast",   Membership.Trap(s.ReactionTime, 0, 80, 220, 320) },
                 { "reaction_slow",   Membership.Trap(s.ReactionTime, 400, 600, 1000, 1000) },
                 { "progress_late",   Membership.Trap(s.Progress, 60, 80, 100, 100) },
                 { "time_long",       Membership.Trap(s.Time, 150, 200, 300, 300) },
                 { "enemies_many",    Membership.Trap(s.Enemies, 10, 20, 40, 50) },
                 { "damage_high",     Membership.Trap(s.DamageTaken, 40, 60, 90, 100) },
-                { "stress_high",     Membership.Gauss(s.StressLevel, 100, 20) }, 
-                { "health_low",      Membership.Tri(s.Health, -1, 0, 50) }
+                { "stress_high",     Membership.Gauss(s.StressLevel, 75, 25) }, 
+                { "health_low",      Membership.Tri(s.Health, 0, 20, 55) }
             };
         }
 

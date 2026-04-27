@@ -142,6 +142,8 @@ namespace FuzzyGameEngine.ViewModels
             ReactionTime = 350;
 
             Calc();
+
+            BiasHistory.Add(adaptive.GetBias());
         }
 
         private void Calc()
@@ -180,8 +182,6 @@ namespace FuzzyGameEngine.ViewModels
                     ChartData.RemoveAt(0);
                     BiasHistory.RemoveAt(0);
                 }
-
-                adaptive.Learn(res);
 
                 var entry = new HistoryEntry
                 {

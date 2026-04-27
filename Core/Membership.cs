@@ -5,8 +5,11 @@
         // 1. Трапецієподібна функція
         public static double Trap(double x, double a, double b, double c, double d)
         {
-            if (x <= a || x >= d) return 0;
-            if (x >= b && x <= c) return 1;
+            if (b == a) a -= 0.001;           
+            if (d == c) d += 0.001;
+
+            if (x <= a || x >= d) return 0.0;
+            if (x >= b && x <= c) return 1.0;
             if (x < b) return (x - a) / (b - a);
             return (d - x) / (d - c);
         }
